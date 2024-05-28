@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+  User User[]
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  full_name  String
+  email      String
+  role       Role     @relation(fields: [role_id], references: [id])
+  role_id    Int
+  created_at DateTime
+  updated_at DateTime
+}
+
+model Option {
+  id          Int           @id @default(autoincrement())
+  name        String
+  sort        Int           @default(1)
+  OptionValue OptionValue[]
+}
+
+model OptionValue {
+  id                 Int                  @id @default(autoincrement())
+  option             Option               @relation(fields: [option_id], references: [id])
+  option_id          Int
+  name               String
+  sort               Int                  @default(1)
+  VariantOptionValue VariantOptionValue[]
+}
+
+model Product {
+  id            Int       @id @default(autoincrement())
+  name          String
+  slug          String    @unique
+  code          String?
+  regular_price Decimal
+  sale_price    Decimal
+  photo         String?
+  desc          String?
+  content       String?
+  display       Boolean   @default(true)
+  Variant       Variant[]
+}
+
+model Variant {
+  id                 Int                  @id @default(autoincrement())
+  product            Product              @relation(fields: [product_id], references: [id])
+  product_id         Int
+  name               String
+  code               String
+  regular_price      Decimal
+  sale_price         Decimal
+  photo              String
+  sort               Int
+  VariantOptionValue VariantOptionValue[]
+}
+
+model VariantOptionValue {
+  id              Int         @id @default(autoincrement())
+  optionValue     OptionValue @relation(fields: [option_value_id], references: [id])
+  option_value_id Int
+  variant         Variant     @relation(fields: [variant_id], references: [id])
+  variant_id      Int
+}
